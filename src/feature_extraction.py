@@ -82,10 +82,10 @@ def extract_features():
     # )
 
     # Read bug reports from tab separated file
-    bug_reports = tsv2dict("D:/Me-hi/20242/Phan_mem_use_LLM/test/bug-localization-by-dnn-and-rvsm/Data_bug/AspectJ.txt")
+    bug_reports = tsv2dict("D:/Me-hi/20242/Phan_mem_use_LLM/test/bug-localization-by-dnn-and-rvsm/Data_bug/SWT.txt")
     #print(bug_reports)
     # Read all java source files
-    java_src_dict = get_all_source_code("D:/Me-hi/20242/Phan_mem_use_LLM/test/bug-localization-by-dnn-and-rvsm/Data_bug/aspectj-bug433351")
+    java_src_dict = get_all_source_code("D:/Me-hi/20242/Phan_mem_use_LLM/test/bug-localization-by-dnn-and-rvsm/Data_bug/eclipse.platform.swt-xulrunner-31")
     #print(java_src_dict)
 
     # Use all CPUs except one to speed up extraction and avoid computer lagging

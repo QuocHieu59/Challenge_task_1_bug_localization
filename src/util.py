@@ -307,7 +307,7 @@ def helper_collections(samples, only_rvsm=False):
 
         sample_dict[s["report_id"]].append(temp_dict)
 
-    bug_reports = tsv2dict("D:/Me-hi/20242/Phan_mem_use_LLM/test/bug-localization-by-dnn-and-rvsm/data/Eclipse_Platform_UI.txt")
+    bug_reports = tsv2dict("D:/Me-hi/20242/Phan_mem_use_LLM/test/bug-localization-by-dnn-and-rvsm/Data_bug/SWT.txt")
     br2files_dict = {}
 
     for bug_report in bug_reports:
@@ -366,6 +366,82 @@ def topk_accuarcy(test_bug_reports, sample_dict, br2files_dict, clf=None):
         acc_dict[i + 1] = round(acc, 3)
 
     return acc_dict
+
+def mean_reciprocal_rank(test_bug_reports, sample_dict, br2files_dict, clf=None):
+    """ Calculates Mean Reciprocal Rank (MRR) """
+    reciprocal_ranks = []
+    negative_total = 0
+
+    for bug_report in test_bug_reports:
+        dnn_input = []
+        corresponding_files = []
+        bug_id = bug_report["id"]
+
+        try:
+            for temp_dict in sample_dict[bug_id]:
+                java_file = list(temp_dict.keys())[0]
+                features_for_java_file = list(temp_dict.values())[0]
+                dnn_input.append(features_for_java_file)
+                corresponding_files.append(java_file)
+        except:
+            negative_total += 1
+            continue
+
+        relevancy_list = clf.predict(dnn_input) if clf else np.array(dnn_input).ravel()
+        ranked_indices = np.argsort(relevancy_list)[::-1]
+        ranked_files = np.array(corresponding_files)[ranked_indices]
+
+        for rank, file in enumerate(ranked_files, start=1):
+            if str(file) in br2files_dict[bug_id]:
+                reciprocal_ranks.append(1.0 / rank)
+                break
+        else:
+            reciprocal_ranks.append(0.0)
+
+    return round(np.mean(reciprocal_ranks), 4)
+
+def mean_average_precision(test_bug_reports, sample_dict, br2files_dict, clf=None):
+    """ Calculates Mean Average Precision (MAP) """
+    average_precisions = []
+    negative_total = 0
+
+    for bug_report in test_bug_reports:
+        dnn_input = []
+        corresponding_files = []
+        bug_id = bug_report["id"]
+
+        try:
+            for temp_dict in sample_dict[bug_id]:
+                java_file = list(temp_dict.keys())[0]
+                features_for_java_file = list(temp_dict.values())[0]
+                dnn_input.append(features_for_java_file)
+                corresponding_files.append(java_file)
+        except:
+            negative_total += 1
+            continue
+
+        relevancy_list = clf.predict(dnn_input) if clf else np.array(dnn_input).ravel()
+        ranked_indices = np.argsort(relevancy_list)[::-1]
+        ranked_files = np.array(corresponding_files)[ranked_indices]
+
+        relevant_files = set(str(f) for f in br2files_dict[bug_id])
+        num_relevant = 0
+        precision_sum = 0.0
+
+        for rank, file in enumerate(ranked_files, start=1):
+            if str(file) in relevant_files:
+                num_relevant += 1
+                precision = num_relevant / rank
+                precision_sum += precision
+
+        if num_relevant > 0:
+            average_precision = precision_sum / num_relevant
+        else:
+            average_precision = 0.0
+
+        average_precisions.append(average_precision)
+
+    return round(np.mean(average_precisions), 4)
 
 
 class CodeTimer:
