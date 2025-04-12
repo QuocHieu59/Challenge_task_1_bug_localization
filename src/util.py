@@ -151,7 +151,7 @@ def normalize(text):
     return stemmed_tokens
 
 
-def cosine_sim(text1, text2):
+def cosine_sim(text1, text2,N=1):
     """ Cosine similarity with tfidf
 
     Arguments:
@@ -161,8 +161,10 @@ def cosine_sim(text1, text2):
     vectorizer = TfidfVectorizer(tokenizer=normalize, min_df=1, stop_words="english")
     tfidf = vectorizer.fit_transform([text1, text2])
     sim = ((tfidf * tfidf.T).toarray())[0, 1]
-
-    return sim
+    num_terms = len(normalize(text2))  # Đếm số từ trong text2 sau khi tokenize
+    g_terms = 1 / (1 + np.exp(-N * num_terms))  # Hàm logistic
+    rVSM_score = g_terms * sim
+    return rVSM_score
 
 
 def get_all_source_code(start_dir):

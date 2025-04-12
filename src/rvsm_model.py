@@ -6,7 +6,7 @@ import numpy as np
 
 def rsvm_model():
     
-    samples = csv2dict("D:/Me-hi/20242/Phan_mem_use_LLM/test/bug-localization-by-dnn-and-rvsm/Data_bug/features_Eclipse_UI.csv")
+    samples = csv2dict("D:/Me-hi/20242/Phan_mem_use_LLM/test/bug-localization-by-dnn-and-rvsm/Data_bug/AspectJ.csv")
     rvsm_list = [float(sample["rVSM_similarity"]) for sample in samples]
 
     # These collections are speed up the process while calculating top-k accuracy

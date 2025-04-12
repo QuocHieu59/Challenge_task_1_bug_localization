@@ -1,10 +1,3 @@
-""" 
-A script for feature extraction.
-
-Used many modified and intact code blocks from 
-'https://github.com/jeffrey-palmerino/BugLocalizationDNN'
-"""
-
 from util import *
 from joblib import Parallel, delayed, cpu_count
 import csv
@@ -44,26 +37,26 @@ def extract(i, br, bug_reports, java_src_dict):
             print(rvsm)
 
             # Class Name Similarity
-            cns = class_name_similarity(br_raw_text, src)
+            #cns = class_name_similarity(br_raw_text, src)
 
             # Previous Reports
-            prev_reports = previous_reports(java_file, br_date, bug_reports)
+            #prev_reports = previous_reports(java_file, br_date, bug_reports)
 
             # Collaborative Filter Score
-            cfs = collaborative_filtering_score(br_raw_text, prev_reports)
+            #cfs = collaborative_filtering_score(br_raw_text, prev_reports)
 
             # Bug Fixing Recency
-            bfr = bug_fixing_recency(br, prev_reports)
+            #bfr = bug_fixing_recency(br, prev_reports)
 
             # Bug Fixing Frequency
-            bff = len(prev_reports)
+            #bff = len(prev_reports)
 
-            features.append([br_id, java_file, rvsm, cfs, cns, bfr, bff, 1])
+            features.append([br_id, java_file, rvsm, 1])
 
             for java_file, rvsm, cns in top_k_wrong_files(
                 br_files, br_raw_text, java_src_dict
             ):
-                features.append([br_id, java_file, rvsm, cfs, cns, bfr, bff, 0])
+                features.append([br_id, java_file, rvsm, 0])
 
         except:
             print("Loi dau do roi")
@@ -82,10 +75,10 @@ def extract_features():
     # )
 
     # Read bug reports from tab separated file
-    bug_reports = tsv2dict("D:/Me-hi/20242/Phan_mem_use_LLM/test/bug-localization-by-dnn-and-rvsm/Data_bug/SWT.txt")
+    bug_reports = tsv2dict("D:/Me-hi/20242/Phan_mem_use_LLM/test/bug-localization-by-dnn-and-rvsm/Data_bug/AspectJ.txt")
     #print(bug_reports)
     # Read all java source files
-    java_src_dict = get_all_source_code("D:/Me-hi/20242/Phan_mem_use_LLM/test/bug-localization-by-dnn-and-rvsm/Data_bug/eclipse.platform.swt-xulrunner-31")
+    java_src_dict = get_all_source_code("D:/Me-hi/20242/Phan_mem_use_LLM/test/bug-localization-by-dnn-and-rvsm/Data_bug/aspectj-bug433351")
     #print(java_src_dict)
 
     # Use all CPUs except one to speed up extraction and avoid computer lagging
@@ -107,10 +100,6 @@ def extract_features():
                 "report_id",
                 "file",
                 "rVSM_similarity",
-                "collab_filter",
-                "classname_similarity",
-                "bug_recency",
-                "bug_frequency",
                 "match",
             ]
         )
